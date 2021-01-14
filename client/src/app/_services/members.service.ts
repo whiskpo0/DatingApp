@@ -1,3 +1,4 @@
+import { Photo } from './../_models/photo';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
@@ -40,5 +41,15 @@ export class MembersService {
         this.members[index] = member; 
       })
     ); 
+  }
+
+  setMainPhoto(photoId: number)
+  { 
+    return this.http.put(this.baseUrl + 'users/set-main-photo/' + photoId, {}); 
+  }
+
+  deletePhoto(photoId: number)
+  {
+    return this.http.delete(this.baseUrl + 'users/delete-photo/' + photoId);
   }
 }

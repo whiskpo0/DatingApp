@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
 using API.Data;
 using API.Helpers;
 using AutoMapper;
@@ -34,9 +35,20 @@ namespace DatingApp.API.Data
         {
             var query = _context.Users
                         .ProjectTo<MemberDTO>(_mapper.ConfigurationProvider)
-                        .AsNoTracking();
+                        .AsNoTracking()
+                        .AsQueryable();
+
+            query = query.Where(u => u.Username != userParams.CurrentUsername); 
+            query = query.Where(u => u.Gender != userParams.Gender); 
+
+            var minDob = DateTime.Today.AddYears(-userParams.MaxAge - 1); 
+            var maxDob = DateTime.Today.AddYears(-userParams.MinAge); 
+
+             query = query.Where(u => u.DateOfBirth >= minDob && u.DateOfBirth <= maxDob); 
                         
-            return await PageList<MemberDTO>.CreateAsync(query, userParams.PageNumber, userParams.PageSize); 
+            return await PageList<MemberDTO>.CreateAsync(query.ProjectTo<MemberDTO>(_mapper.ConfigurationProvider).AsNoTracking(),
+                                                         userParams.PageNumber,
+                                                         userParams.PageSize); 
         }
 
         public async Task<AppUser> GetUserByIdAsync(int id)
